@@ -34,61 +34,75 @@ function operate(num1, num2, op) {
 
 keys.addEventListener('click', e => {
   if (e.target.matches('button')) {
-    for (let i=0 ; i<=9; i++) {
-        if (e.target.textContent === `${i}`) {
-            if (document.getElementById("display").innerHTML==="0") {
-                document.getElementById("display").innerHTML=`${i}`
-            }
-            else {
-                document.getElementById("display").innerHTML+=`${i}`
-            }
-    if (operator) {
-      value_2 += keyValue // Concaténation de la chaîne
-    } else {
-      value_1 = (value_1 === null) ? keyValue : value_1 + keyValue
+    const keyValue = e.target.textContent; // Récupérer la valeur du bouton
+    const display = document.getElementById("display");
+
+    // Gestion des chiffres
+    if (!isNaN(keyValue)) { // Vérifie si keyValue est un chiffre
+      if (display.innerHTML === "0" || operator === "=") {
+        display.innerHTML = keyValue; // Remplace le contenu si c'est le début
+        operator = null; // Réinitialise l'opérateur après "="
+      } else {
+        display.innerHTML += keyValue; // Ajoute le chiffre
+      }
+    }
+
+    // Gestion du bouton "AC"
+    if (e.target.dataset.action === "clear") {
+      display.innerHTML = "0";
+      value_1 = null;
+      value_2 = "0";
+      operator = null;
+    }
+
+    // Gestion des opérateurs
+    if (["add", "subtract", "multiply", "divide", "calculate"].includes(e.target.dataset.action)) {
+      // Convertir les actions en opérateurs valides
+      const actualOperator = e.target.dataset.action === "add" ? "+" :
+                             e.target.dataset.action === "subtract" ? "-" :
+                             e.target.dataset.action === "multiply" ? "*" :
+                             e.target.dataset.action === "divide" ? "/" : null;
+
+      if (e.target.dataset.action !== "calculate") {
+        if (value_1 === null) {
+          value_1 = parseFloat(display.innerHTML); // Stocke la première valeur
+          operator = actualOperator; // Stocke l'opérateur
+          display.innerHTML = ""; // Efface l'affichage pour la prochaine entrée
+        } else {
+          value_2 = parseFloat(display.innerHTML); // Récupère la deuxième valeur
+          const result = operate(value_1, value_2, operator); // Effectue l'opération
+          display.innerHTML = result; // Affiche le résultat
+          value_1 = result; // Met à jour value_1 pour les calculs suivants
+          operator = actualOperator; // Met à jour l'opérateur
+        }
+      } else {
+        if (value_1 !== null && operator !== null) {
+          value_2 = parseFloat(display.innerHTML); // Récupère la deuxième valeur
+          const result = operate(value_1, value_2, operator); // Effectue l'opération
+          display.innerHTML = result; // Affiche uniquement le résultat
+          value_1 = null; // Réinitialise value_1
+          value_2 = "0"; // Réinitialise value_2
+          operator = null; // Réinitialise l'opérateur
+        }
+      }
     }
   }
-    if (e.target.textContent === "AC") {
-        document.getElementById("display").innerHTML="0"
-        value_1 = null
-        value_2 = "0"
-        operator = null
-    }
-    else if (["+", "-", "*", "/"].includes(e.target.textContent)) {
-      operator = e.target.textContent
-      console.log("l'opérateur est")
-      console.log(`${operator}`)
-      if (value_1===null) {
-        value_1 = parseFloat(document.getElementById("display").innerHTML)
-        document.getElementById("display").innerHTML="0"
-      }
-      else if (value_1!==null) {
-        res=operate(value_1,parseFloat(value_2),operator)
-        console.log("le vrai résultat est")
-        console.log(`${res}`)
-        document.getElementById("display").innerHTML=res
-      }
-          }
-      else if (e.target.textContent === "=") {
-        document.getElementById("display").innerHTML
-          }
-        }
-        }
+});
 
-    const key = e.target;
-    const action = key.dataset.action
-    if (!action) {
-      console.log('number key!')
-    }
-    if (
-      action === 'add' ||
-      action === 'subtract' ||
-      action === 'multiply' ||
-      action === 'divide'
-    ) {
-      console.log('operator key!')
-    }
-    if (action === 'decimal') {
-      console.log('decimal key!')
-    }
-})
+    // //const key = e.target;
+    // const action = key.dataset.action
+    // if (!action) {
+    //   console.log('number key!')
+    // }
+    // if (
+    //   action === 'add' ||
+    //   action === 'subtract' ||
+    //   action === 'multiply' ||
+    //   action === 'divide'
+    // ) {
+    //   console.log('operator key!')
+    // }
+    // if (action === 'decimal') {
+    //   console.log('decimal key!')
+    // }
+
